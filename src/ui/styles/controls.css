@@ -887,6 +887,45 @@ body.gev-drawing #cesiumContainer canvas {
   flex: 1 1 110px;
   min-width: 0;
 }
+#site-camera-row {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+.site-cam-select {
+  flex: 1 1 96px;
+  min-width: 0;
+}
+.site-mount-label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+}
+.site-mount-input {
+  flex: 0 0 42px;
+  width: 42px;
+}
+.site-dori-legend {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+.site-dori-item::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 4px;
+  border-radius: 2px;
+  background: var(--dori);
+}
 body.gev-siting #cesiumContainer canvas {
   cursor: crosshair;
 }

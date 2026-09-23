@@ -7,6 +7,7 @@ import {
   addMeasure,
   removeLast,
   removeItem,
+  addCamera,
   measureBetween,
   formatFeet,
   formatMeasurement,
@@ -76,7 +77,7 @@ test('undo removes the newest item across pins and measures', () => {
   assert.equal(removeLast(site), false);
 });
 
-test('a site round-trips through its file format, cameras untouched', () => {
+test('a site round-trips through its file format, cameras included', () => {
   const site = createSite('Lake House');
   site.view = {
     lat: 30,
@@ -88,7 +89,14 @@ test('a site round-trips through its file format, cameras untouched', () => {
   };
   addPin(site, A, 'Gate');
   addMeasure(site, A, { ...A, height: 155 }, 'Eave');
-  site.cameras = [{ id: 'cam-1', fovDeg: 90 }];
+  addCamera(site, {
+    lat: 30,
+    lon: -97,
+    height: 5,
+    heading: 1,
+    tilt: -0.3,
+    lens: '6',
+  });
   const { site: back, error, skipped } = parseSite(serializeSite(site));
   assert.equal(error, null);
   assert.equal(skipped, 0);
@@ -96,7 +104,9 @@ test('a site round-trips through its file format, cameras untouched', () => {
   assert.deepEqual(back.view, site.view);
   assert.equal(back.pins[0].label, 'Gate');
   assert.equal(back.measures[0].b.height, 155);
-  assert.deepEqual(back.cameras, [{ id: 'cam-1', fovDeg: 90 }]);
+  assert.equal(back.cameras.length, 1);
+  assert.equal(back.cameras[0].lens, '6');
+  assert.equal(back.cameras[0].label, 'CAM 1');
 });
 
 test('parsing rejects foreign or newer files and skips bad items', () => {
@@ -120,5 +130,23 @@ test('file names are safe and modes normalize', () => {
   );
   assert.equal(siteFileName(createSite('')), 'site.gev-site.json');
   assert.equal(normalizeSiteMode('measure'), 'measure');
+  assert.equal(normalizeSiteMode('camera'), 'camera');
   assert.equal(normalizeSiteMode('bogus'), 'pin');
+});
+
+test('undo reaches cameras too, and bad cameras in a file are skipped', () => {
+  const site = createSite();
+  addPin(site, A);
+  assert.ok(addCamera(site, { lat: 30, lon: -97, heading: 0, tilt: 0 }));
+  assert.equal(addCamera(site, { lat: 30 }), null);
+  removeLast(site);
+  assert.equal(site.cameras.length, 0);
+  assert.equal(site.pins.length, 1);
+  const { site: parsed, skipped } = parseSite({
+    format: 'gev-site',
+    version: 1,
+    cameras: [{ lat: 1, lon: 1, heading: 0, tilt: 0 }, { nope: true }],
+  });
+  assert.equal(parsed.cameras.length, 1);
+  assert.equal(skipped, 1);
 });

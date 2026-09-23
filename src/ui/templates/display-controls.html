@@ -125,7 +125,26 @@
         <div class="pp-mode-seg" role="radiogroup" aria-label="Site tool">
           <button class="pp-mode-btn active" data-site-mode="pin" role="radio" aria-checked="true">Pin</button>
           <button class="pp-mode-btn" data-site-mode="measure" role="radio" aria-checked="false">Measure</button>
+          <button class="pp-mode-btn" data-site-mode="camera" role="radio" aria-checked="false">Camera</button>
         </div>
+      </div>
+      <div class="pp-slider-row" id="site-camera-row">
+        <select class="pp-select site-cam-select" id="site-lens-select" aria-label="Camera lens" title="Lens (horizontal field of view)">
+          <option value="2.8">2.8 mm · 103°</option>
+          <option value="4" selected>4 mm · 84°</option>
+          <option value="6">6 mm · 54°</option>
+          <option value="8">8 mm · 40°</option>
+          <option value="12">12 mm · 27°</option>
+        </select>
+        <select class="pp-select site-cam-select" id="site-res-select" aria-label="Camera resolution">
+          <option value="2mp">2 MP</option>
+          <option value="4mp" selected>4 MP</option>
+          <option value="8mp">8 MP (4K)</option>
+        </select>
+        <label class="site-mount-label" title="Raise the mount above the point you click — use when the map has no 3D buildings">+<input type="number" class="pp-text-input site-mount-input" id="site-mount-input" min="0" max="60" step="1" value="0" aria-label="Mount height above the clicked point, feet">ft</label>
+        <button class="pp-mode-btn site-btn" id="site-recompute" type="button" title="Re-cast every camera's coverage (after 3D buildings finish loading)">Recast</button>
+        <button class="pp-mode-btn site-btn" id="site-csv" type="button" title="Download the camera schedule as CSV for a quote">CSV</button>
+        <div class="site-dori-legend" id="site-dori-legend" aria-label="Coverage colour key: pixel density bands (IEC 62676-4)"></div>
       </div>
       <div class="pp-slider-row" id="site-label-row">
         <input type="text" class="pp-text-input" id="site-label-input" maxlength="120" placeholder="Label for next pin / measure" aria-label="Label for the next pin or measurement" autocomplete="off" spellcheck="false">

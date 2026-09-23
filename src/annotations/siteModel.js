@@ -3,17 +3,18 @@
  *
  * A site is a named, saveable record of one property: the camera view that
  * frames it, labelled pins (gear locations, entry points, panel), and
- * point-to-point measurements (cable runs, mount heights). `cameras` is
- * reserved for the coverage planner and round-trips untouched.
+ * point-to-point measurements (cable runs, mount heights), and planned
+ * security cameras (see cameraPlan.js).
  *
  * Measurements keep the HEIGHT of both ends — the whole point is that a click
  * on the ground and a click on an eave gives a mount height — so unlike the
  * whiteboard (see `finishSpec` in drawMode.js) nothing is draped.
  */
+import { normalizeCamera } from './cameraPlan.js';
 
 export const SITE_FORMAT = 'gev-site';
 export const SITE_VERSION = 1;
-export const SITE_MODES = Object.freeze(['pin', 'measure']);
+export const SITE_MODES = Object.freeze(['pin', 'measure', 'camera']);
 export const MAX_SITE_ITEMS = 200;
 export const FEET_PER_METER = 3.280839895;
 const EARTH_RADIUS_M = 6371008.8;
@@ -45,7 +46,7 @@ const cleanText = (s, max) =>
 
 /** Normalize a mode word; anything unknown is a pin. */
 export function normalizeSiteMode(mode) {
-  return mode === 'measure' ? 'measure' : 'pin';
+  return SITE_MODES.includes(mode) ? mode : 'pin';
 }
 
 /** Great-circle ground distance between two points, metres (haversine). */
@@ -103,7 +104,8 @@ export function createSite(name = '') {
   };
 }
 
-const itemCount = (site) => site.pins.length + site.measures.length;
+const itemCount = (site) =>
+  site.pins.length + site.measures.length + site.cameras.length;
 let idSeq = 0;
 // Time and sequence lead so ids sort in creation order across kinds (undo).
 const nextId = (prefix) =>
@@ -140,17 +142,31 @@ export function addMeasure(site, a, b, label = '') {
   return m;
 }
 
-/** Remove a pin or measurement by id. */
+/**
+ * Add a planned camera (mount, aim, lens, resolution). Returns the normalized
+ * camera, or null.
+ */
+export function addCamera(site, raw) {
+  if (itemCount(site) >= MAX_SITE_ITEMS) return null;
+  const cam = normalizeCamera(raw, site.cameras.length);
+  if (!cam) return null;
+  cam.id = nextId('cam');
+  site.cameras.push(cam);
+  return cam;
+}
+
+/** Remove a pin, measurement or camera by id. */
 export function removeItem(site, id) {
   const before = itemCount(site);
   site.pins = site.pins.filter((p) => p.id !== id);
   site.measures = site.measures.filter((m) => m.id !== id);
+  site.cameras = site.cameras.filter((c) => c.id !== id);
   return itemCount(site) < before;
 }
 
-/** Remove the most recently added pin or measurement. */
+/** Remove the most recently added pin, measurement or camera. */
 export function removeLast(site) {
-  const last = [...site.pins, ...site.measures]
+  const last = [...site.pins, ...site.measures, ...site.cameras]
     .sort((x, y) => (x.id < y.id ? -1 : 1))
     .pop();
   return last ? removeItem(site, last.id) : false;
@@ -182,9 +198,8 @@ export function serializeSite(site) {
 }
 
 /**
- * Parse and validate a site file. Unknown fields are dropped, bad items are
- * skipped rather than failing the whole file, and `cameras` is kept as-is
- * (array of plain objects) for the coverage planner.
+ * Parse and validate a site file. Unknown fields are dropped and bad items
+ * are skipped rather than failing the whole file.
  * @returns {{site: object|null, error: string|null, skipped: number}}
  */
 export function parseSite(text) {
@@ -214,11 +229,9 @@ export function parseSite(text) {
     const msr = addMeasure(site, m?.a, m?.b, m?.label);
     if (!msr) skipped += 1;
   }
-  site.cameras = Array.isArray(raw.cameras)
-    ? raw.cameras
-        .filter((c) => c && typeof c === 'object')
-        .slice(0, MAX_SITE_ITEMS)
-    : [];
+  for (const c of Array.isArray(raw.cameras) ? raw.cameras : []) {
+    if (!addCamera(site, c)) skipped += 1;
+  }
   return { site, error: null, skipped };
 }
 
@@ -234,6 +247,10 @@ export function siteFileName(site) {
 
 /** Hint line for the panel. */
 export function siteHint(mode, pending) {
+  if (mode === 'camera')
+    return pending
+      ? 'Now click where the camera should look.'
+      : 'Click the mount point (eave, wall, pole), then where it should look.';
   if (mode === 'measure')
     return pending
       ? 'Click the second point. Esc cancels.'
