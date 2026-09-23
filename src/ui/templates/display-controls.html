@@ -116,6 +116,33 @@
       </div>
     </div>
     <div class="pp-toggle-group">
+      <button class="pp-toggle-btn" id="site-toggle" title="Job-site recon — drop labelled pins, measure runs and mount heights, save the site" aria-pressed="false">
+        <span class="pp-icon material-symbols-outlined" aria-hidden="true">straighten</span>
+        <span class="pp-label">Site</span>
+      </button>
+      <div class="pp-slider-row" id="site-mode-row">
+        <span class="pp-slider-mini-label">Tool</span>
+        <div class="pp-mode-seg" role="radiogroup" aria-label="Site tool">
+          <button class="pp-mode-btn active" data-site-mode="pin" role="radio" aria-checked="true">Pin</button>
+          <button class="pp-mode-btn" data-site-mode="measure" role="radio" aria-checked="false">Measure</button>
+        </div>
+      </div>
+      <div class="pp-slider-row" id="site-label-row">
+        <input type="text" class="pp-text-input" id="site-label-input" maxlength="120" placeholder="Label for next pin / measure" aria-label="Label for the next pin or measurement" autocomplete="off" spellcheck="false">
+        <button class="pp-mode-btn site-btn" id="site-undo" type="button" title="Remove the newest pin or measurement (Backspace)">Undo</button>
+      </div>
+      <div class="pp-slider-row" id="site-file-row">
+        <input type="text" class="pp-text-input" id="site-name-input" maxlength="80" placeholder="Site name (e.g. Smith Residence)" aria-label="Site name" autocomplete="off" spellcheck="false">
+        <button class="pp-mode-btn site-btn" id="site-save" type="button" title="Save this site and the current view in this browser">Save</button>
+        <select class="pp-select site-load-select" id="site-load-select" aria-label="Open a saved site"></select>
+        <button class="pp-mode-btn site-btn" id="site-new" type="button" title="Start an empty site">New</button>
+        <button class="pp-mode-btn site-btn" id="site-export" type="button" title="Download this site as a .gev-site.json file">Export</button>
+        <button class="pp-mode-btn site-btn" id="site-import" type="button" title="Open a .gev-site.json file">Import</button>
+        <input type="file" id="site-import-input" accept=".json,application/json" hidden>
+        <span class="draw-hint" id="site-hint" aria-live="polite"></span>
+      </div>
+    </div>
+    <div class="pp-toggle-group">
       <button class="pp-toggle-btn" id="celestial-toggle" title="Celestial ring — reveal the full globe" aria-pressed="false">
         <span class="pp-icon material-symbols-outlined" aria-hidden="true">flare</span>
         <span class="pp-label">Celestial</span>

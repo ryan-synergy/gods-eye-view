@@ -1780,6 +1780,8 @@
       "src/data/inputOwnership.js",
       "src/annotations/drawMode.js",
       "src/annotations/drawTool.js",
+      "src/annotations/siteModel.js",
+      "src/annotations/siteTool.js",
       "src/data/routeSteps.js",
       "src/layers/directions/index.js",
       "src/data/directions.js",
