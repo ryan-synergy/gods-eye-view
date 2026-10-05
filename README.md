@@ -1,3 +1,5 @@
+> **Fork note:** this is a fork that adds job-site recon and a camera coverage planner. See [SYNERGY.md](SYNERGY.md) for what it adds and its current state, and [CLAUDE.md](CLAUDE.md) for working rules. Everything below is the upstream README.
+
 <div align="center">
 
 # 🌐 God's Eye View
